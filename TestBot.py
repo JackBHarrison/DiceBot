@@ -1,6 +1,7 @@
 import discord
-import random
 import re
+import random
+
 
 def mergeSort(arr):
     if len(arr) > 1:
