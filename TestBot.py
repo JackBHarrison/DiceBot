@@ -1,15 +1,11 @@
 import discord
-
-#test
-
 import re
 import random
-
 
 def mergeSort(arr):
     if len(arr) > 1:
  
-         # Finding the mid of the array
+        # Finding the mid of the array
         mid = len(arr)//2
  
         # Dividing the array elements
@@ -45,16 +41,19 @@ def mergeSort(arr):
             j += 1
             k += 1
 
+#starts client
 client = discord.Client()
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
 
+#checks that the bot is not respondind to its own message
 @client.event
 async def on_message(message):
     if message.author == client.user:
         return
     
+    #rolls 4d6 drop 1
     if message.content.startswith('$character'):
         dice = []
         i=0
@@ -66,11 +65,13 @@ async def on_message(message):
         stat = 0
         stats = []
 
+        #rolls 4 dice six times
         while y < 6:
             while i < 4:
                 rand = random.randint(1,6)
                 arr.append(rand)
                 i+=1
+            #sorts and does not count lowest number    
             mergeSort(arr)
             i = 0
             while i < 3:
@@ -83,6 +84,7 @@ async def on_message(message):
             dice.append(arr)
             arr = []
             y+=1
+        #formats the dice rolls
         for x in dice:
             roll = roll+"["
             roll += ', '.join(str(y) for y in x)
@@ -97,10 +99,18 @@ async def on_message(message):
 
     if message.content.startswith('$'):
         dice = []
+        op = 0
+        #changes op depending on if the message contains a + or minus operator
+        if "+" in message.content:
+            op = 1
+        if "-" in message.content:
+            op = 2
+        #removes $
         txt = message.content[1:]
+        #makes the number of rolls one if left blank
         if txt[0] == "d" or txt[0] == "D":
             txt = '1'+txt
-        x = re.split("d|D", txt)
+        x = re.split("d|D|\+|\-", txt)
         i=0
         sum = 0
         while i < int(x[0]):
@@ -109,10 +119,16 @@ async def on_message(message):
             sum += rand
             i+=1
         roll = ', '.join(str(x) for x in dice)
+        if op == 1:
+            sum += int(x[2])
+        if op == 2:
+            sum -= int(x[2])
         total = "Total is: "+str(sum)
         roll = "["+roll+"]"
         await message.channel.send(total)
         await message.channel.send(roll)
 
-
+f = open("token.txt", "r")
+token=f.readline()
+client.run(token)
 
